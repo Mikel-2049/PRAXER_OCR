@@ -1,0 +1,22 @@
+# .gitignore
+
+# Ignore the virtual environment folder
+venv/
+myenv/
+.env/
+ocr_praxer_env/
+
+# Ignore Mac system files
+.DS_Store
+
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore other unnecessary files
+*.swp
+*.swo
+
+# Ignore Images folder
+Images/
