@@ -198,7 +198,7 @@ def find_cells(image):
 
     cell_regions, num_rows = identify_individual_black_cells(cell_mask)
 
-    print(num_rows)
+    #print(num_rows)
 
     # Calculate height and width thresholds
     height_threshold, width_threshold = calculate_cell_thresholds(cell_regions)
@@ -206,6 +206,7 @@ def find_cells(image):
     # Prune the cell regions based on the calculated thresholds
     pruned_cell_regions = prune_cell_regions(cell_regions, height_threshold, width_threshold)
 
+    '''
     # Create a copy of the original image for visualization 
     image_copy = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR) ## Can be deleted 
 
@@ -219,10 +220,13 @@ def find_cells(image):
     plt.title('Cell Regions')
     plt.axis('off')
     plt.show()
+    '''
 
     num_rows, num_columns = calculate_grid_dimensions(pruned_cell_regions)
 
+    '''
     print(num_columns)
     print(num_rows)
+    '''
 
     return pruned_cell_regions, num_rows, num_columns
