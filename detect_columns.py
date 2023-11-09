@@ -1,20 +1,19 @@
+from collections import defaultdict
+
 def detect_columns(cells):
-    # Find the unique x-coordinates of the cell boundaries
-    x_boundaries = sorted({cell[0] for cell in cells})
+    # Create a dictionary to hold cells by their starting x-coordinate
+    columns = defaultdict(list)
     
-    # Initialize the list of columns
-    columns = [[] for _ in range(len(x_boundaries) - 1)]
-    
-    # Assign each cell to a column based on its x-coordinate
+    # Group cells by their starting x-coordinate
     for cell in cells:
-        for i in range(len(x_boundaries) - 1):
-            left = x_boundaries[i]
-            right = x_boundaries[i + 1]
-            if left <= cell[0] < right:
-                columns[i].append(cell)
-                break
+        columns[cell[0]].append(cell)
     
-    return columns
+    # Sort cells within each column by their y-coordinate to maintain vertical order
+    for col in columns.values():
+        col.sort(key=lambda x: x[1])
+    
+    # Return the columns sorted by the x-coordinate of the first cell in each column
+    return [columns[key] for key in sorted(columns)]
 
 
 
