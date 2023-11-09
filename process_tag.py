@@ -49,7 +49,7 @@ def read_tag(image_path, column, num_rows):
         data.append(text)
 
     df = pd.DataFrame(data, columns=['TAG'])
-    print(df)
+    #print(df)
 
     return df
 

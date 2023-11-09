@@ -34,7 +34,7 @@ def read_item(image_path, column):
     
     # Create DataFrame with the 'ITEM' column
     df = pd.DataFrame(data, columns=['ITEM'])
-    print(df)
+    #print(df)
     return df
 
 

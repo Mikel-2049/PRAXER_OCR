@@ -7,6 +7,7 @@ from process_tag import read_tag
 from process_quantity import read_quantity
 from process_nps import read_nps
 from process_material_description import read_material_description
+from merge_columns import merge_columns
 
 
 def main():
@@ -19,6 +20,17 @@ def main():
     quantity_column = read_quantity(image, columns[3], num_rows)
     nps_column = read_nps(image, columns[4], num_rows)
     material_description_column = read_material_description(image, columns[5], num_rows)
+
+    final_dataframe = merge_columns(
+        item_column,
+        item_code_column,
+        tag_column,
+        quantity_column,
+        nps_column,
+        material_description_column
+    )
+
+    print(final_dataframe)
 
 
 if __name__ == "__main__":

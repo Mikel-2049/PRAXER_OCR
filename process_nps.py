@@ -57,7 +57,7 @@ def read_nps(image_path, column, num_rows):
 
     # Since the first cell was skipped, the index should be offset by 1
     df = pd.DataFrame(data, columns=['NPS'])
-    print(df)
+    #print(df)
 
     return df
 
