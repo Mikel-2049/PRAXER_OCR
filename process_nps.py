@@ -3,32 +3,30 @@ from utils import is_similar
 import pandas as pd
 import cv2
 from pytesseract import pytesseract as PT
+import numpy as np
 
 
 PT.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
 
 def preprocess_image(img, coords):
-    # Extract the region of interest using the coordinates
     x, y, w, h = coords
     cell = img[y:y+h, x:x+w]
-
-    # Convert to grayscale
     gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
 
-    # Thresholding to get a binary image
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # Resize the image for better OCR
+    scale_factor = 2
+    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
 
-    # Resize the image to make it larger for better OCR
-    scale_factor = 2.5  # Example: Make the image double its size
-    width = int(w * scale_factor)
-    height = int(h * scale_factor)
-    dim = (width, height)
+    # Apply a bilateral filter to preserve edges and reduce noise
+    bilateral = cv2.bilateralFilter(resized_gray, 9, 75, 75)
 
-    # Perform the actual resizing of the image
-    resized = cv2.resize(thresh, dim, interpolation=cv2.INTER_LINEAR)
+    # Apply adaptive thresholding
+    adaptive_thresh = cv2.adaptiveThreshold(bilateral, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    return resized
+    return adaptive_thresh
+
+
 
 def read_nps(image_path, column, num_rows):
     img = cv2.imread(image_path)
@@ -48,8 +46,10 @@ def read_nps(image_path, column, num_rows):
         
         # Preprocess the image (if necessary)
         processed_cell = preprocess_image(img, coords)
+        #cv2.imshow('Processed cell',processed_cell)
+        #cv2.waitKey(0)
         #Configuration based on column
-        custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789M/X\"'
+        custom_config = r'--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789/X\"'
         # Extract text from the cell using OCR
         text = PT.image_to_string(processed_cell, config=custom_config).strip()
         # Append the text to the data list
