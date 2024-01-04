@@ -3,6 +3,9 @@ import os
 import pandas as pd
 from detect_cells import find_cells
 from detect_columns import detect_columns
+from detect_headers import read_headers
+from detect_headers import get_column_function_map
+from detect_headers import is_header_similar
 from process_item import read_item
 from process_item_code import read_item_code
 from process_tag import read_tag
@@ -15,24 +18,26 @@ from merge_columns import merge_columns
 def process_image(image_path):
     cell_regions, num_rows, num_columns = find_cells(image_path)
     columns = detect_columns(cell_regions)
-    item_column = read_item(image_path, columns[0])
-    item_code_column = read_item_code(image_path, columns[1], num_rows)
-    tag_column = read_tag(image_path, columns[2], num_rows)
-    quantity_column = read_quantity(image_path, columns[3], num_rows)
-    nps_column = read_nps(image_path, columns[4], num_rows)
-    material_description_column = read_material_description(image_path, columns[5], num_rows)
+    headers = read_headers(image_path, columns)
+    column_function_map = get_column_function_map(num_rows)
 
-    return merge_columns(
-        item_column,
-        item_code_column,
-        tag_column,
-        quantity_column,
-        nps_column,
-        material_description_column
-    )
+    data_columns = []
+    for ocr_header, column in zip(headers, columns):
+        matched = False
+        for expected_header, (func, args) in column_function_map.items():
+            if is_header_similar(ocr_header, expected_header):
+                # Call the associated function with unpacked arguments
+                data_columns.append(func(image_path, column, *args))
+                matched = True
+                break
+        if not matched:
+            print(f"Unexpected or unreadable header: {ocr_header}")
+            data_columns.append(None)  # Placeholder for unexpected columns
+
+    return merge_columns(*data_columns)
 
 def main():
-    folder_path = 'Images'
+    folder_path = 'Images/NPS_Quantity'
     all_dataframes = []
 
     for filename in os.listdir(folder_path):
@@ -43,6 +48,11 @@ def main():
 
     final_dataframe = pd.concat(all_dataframes, ignore_index=True)
     print(final_dataframe)
+
+    # Save to Excel file
+    output_file = 'output.xlsx'  # Define the Excel file name
+    final_dataframe.to_excel(output_file, index=False)
+    print(f"Data saved to {output_file}")
 
 
 if __name__ == "__main__":
