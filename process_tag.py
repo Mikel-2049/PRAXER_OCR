@@ -8,26 +8,15 @@ from pytesseract import pytesseract as PT
 PT.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
 def preprocess_image(img, coords):
-    # Extract the region of interest using the coordinates
     x, y, w, h = coords
     cell = img[y:y+h, x:x+w]
-
-    # Convert to grayscale
     gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
 
-    # Thresholding to get a binary image
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # Resize the image for better OCR
+    scale_factor = 2.5
+    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
 
-    # Resize the image to make it larger for better OCR
-    scale_factor = 2.5  # Example: Make the image double its size
-    width = int(w * scale_factor)
-    height = int(h * scale_factor)
-    dim = (width, height)
-
-    # Perform the actual resizing of the image
-    resized = cv2.resize(thresh, dim, interpolation=cv2.INTER_LINEAR)
-
-    return resized
+    return resized_gray
 
 
 def read_tag(image_path, column, num_rows):

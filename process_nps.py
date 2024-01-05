@@ -15,16 +15,16 @@ def preprocess_image(img, coords):
     gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
 
     # Resize the image for better OCR
-    scale_factor = 2
+    scale_factor = 2.5
     resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
 
     # Apply a bilateral filter to preserve edges and reduce noise
-    bilateral = cv2.bilateralFilter(resized_gray, 9, 75, 75)
+    #bilateral = cv2.bilateralFilter(resized_gray, 9, 75, 75)
 
     # Apply adaptive thresholding
-    adaptive_thresh = cv2.adaptiveThreshold(bilateral, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    #adaptive_thresh = cv2.adaptiveThreshold(bilateral, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    return adaptive_thresh
+    return resized_gray
 
 
 
