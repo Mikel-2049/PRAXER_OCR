@@ -14,7 +14,7 @@ def preprocess_image(img, coords):
 
     # Resize the image for better OCR
     scale_factor = 2.5
-    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
+    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
 
     return resized_gray
 

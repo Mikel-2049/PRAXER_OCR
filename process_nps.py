@@ -16,15 +16,16 @@ def preprocess_image(img, coords):
 
     # Resize the image for better OCR
     scale_factor = 2.5
-    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
+    resized_gray = cv2.resize(gray, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+    
+    # Adaptive thresholding with a larger block size and a fine-tuned C value
+    block_size = 41  # Block size for the adaptive threshold (try to keep it odd)
+    C = 5  # Constant subtracted from the mean or weighted mean (this may need tuning)
+    binarized = cv2.adaptiveThreshold(resized_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                      cv2.THRESH_BINARY, block_size, C)
 
-    # Apply a bilateral filter to preserve edges and reduce noise
-    #bilateral = cv2.bilateralFilter(resized_gray, 9, 75, 75)
+    return binarized
 
-    # Apply adaptive thresholding
-    #adaptive_thresh = cv2.adaptiveThreshold(bilateral, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-
-    return resized_gray
 
 
 
@@ -46,8 +47,14 @@ def read_nps(image_path, column, num_rows):
         
         # Preprocess the image (if necessary)
         processed_cell = preprocess_image(img, coords)
-        #cv2.imshow('Processed cell',processed_cell)
-        #cv2.waitKey(0)
+
+        '''
+        #Show each cell being fed to have a visualization and be able to improve the preprocessing
+
+        cv2.imshow('Processed cell',processed_cell)
+        cv2.waitKey(0)
+        '''
+
         #Configuration based on column
         custom_config = r'--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789/X\"'
         # Extract text from the cell using OCR
